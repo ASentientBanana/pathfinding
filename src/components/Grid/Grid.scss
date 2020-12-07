@@ -1,0 +1,10 @@
+#Grid{
+    border:  black solid 2px;
+    width: 800px;
+    height: 500px;
+    display: flex;
+    display: grid;
+    // column-gap: 2px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}

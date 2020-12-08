@@ -1,5 +1,6 @@
 #grid-tile {
   border: solid grey 1px;
+  background: red;
   min-width: 5px;
   max-width: 1000px;
   min-height: 5px;

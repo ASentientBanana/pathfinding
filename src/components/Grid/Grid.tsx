@@ -1,32 +1,46 @@
-import React, {useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import GridTile from '../GridTile/GridTile'
 import './Grid.css'
-
+import Tile from '../../util/Tile';
 const Grid = () => {
-    const [graph,setGraph] = useState<number[][]>([
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0]
-    ]);
-    useEffect(()=>{},[graph]);
-    const changeTile= (row:number,col:number)=>{
-        graph[row][col] = 1;
-        if(col !== graph[0].length-1) graph[row][col+1] = 1;
-        if(col !== 0) graph[row][col-1] = 1;
-        if(row !== graph.length-1) graph[row+1][col] = 1;
-        if(row !== 0) graph[row-1][col] = 1;
-        setGraph([...graph])
+    const [graph, setGraph] = useState<Tile[][]>();
+    const rows: any = 10;
+    const cols: any = 10;
+    const visitedNodes: Tile[] = []
+    const notVisitedNodes: Tile[] = []
+    const [startNode, setStartNode] = useState<Tile>();
+    const [endNode, setEndNode] = useState<Tile>();
+
+    useEffect(() => {
+        console.log(graph);
+        if (!graph) setGraph(new Array(cols));
+        console.log(graph);
+        if (graph) {
+            for (let index = 0; index < rows; index++) graph![index] = new Array(rows);
+            for (let col = 0; col < cols; col++) for (let row = 0; row < rows; row++) {
+                if (graph) {
+                    graph![col][row] = new Tile(col, row, false);
+                    notVisitedNodes.push(graph![col][row])
+                }
+            }
+        }
+        if (graph) {
+            setStartNode(graph[0][0]);
+            setEndNode(graph[cols - 1][rows - 1]);
+            visitedNodes.push(startNode!);
+        }
+
+    }, [graph]);
+
+    const aStar = () => {
+        while (notVisitedNodes.length > 0) {
+
+        }
     }
+
     return (
         <div id="Grid">
-            {graph.map((g,row)=>g.map((tile,col)=> <GridTile key={Math.random()*100000} tile={tile} row={row} col={col} callback={changeTile}/>))}
+            {graph?.map((g, row) => g.map((tile, col) => <GridTile key={Math.random() * 100000} tile={tile.f} row={row} col={col} isVisited={tile.isVisited} callback={null} />))}
         </div>
     );
 }

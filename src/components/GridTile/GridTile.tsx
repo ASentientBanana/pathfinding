@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import './GridTile.css';
 
-const GridTile = ({ row , col ,callback,tile}: any) => {
+const GridTile = ({ row, col, callback, tile, isVisited }: any) => {
     let isBarier: boolean = false;
-    useEffect(()=>{
-        
-    },[isBarier]);
+    const [isVisitedNode, setIsVisitedNode] = useState<boolean>(true);
+    let color = "white";
+    useEffect(() => {
+        if (isVisitedNode) color = "red";
+        else color = "white";
+    }, [isVisitedNode]);
     const checkNeighbours = () => {
-        callback(row,col);
-        isBarier= true;
+        console.log(color);
+        setIsVisitedNode(true);
+        console.log(isVisitedNode);
+
     }
-return  <div id="grid-tile" onClick={checkNeighbours}>{tile}</div>
+    return <div id="grid-tile" onClick={checkNeighbours} style={{ backgroundColor: color }}>{tile}</div>
 }
 export default GridTile

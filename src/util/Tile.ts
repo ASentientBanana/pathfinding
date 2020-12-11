@@ -6,14 +6,39 @@ class Tile {
     f: number;
     g: number;
     h: number;
+    tileSize: number;
+    id: string
     isVisited: boolean;
-    constructor(x: number, y: number, isVisited: boolean) {
+    neighbors: Tile[]
+    previusTile: Tile | undefined;
+    isWalkable: boolean;
+    constructor(y: number, x: number, tileSize: number = 25, isWalkable: boolean = true) {
         this.f = 0;
         this.g = 0;
         this.h = 0;
         this.x = x;
         this.y = y;
-        this.isVisited = isVisited;
+        this.id = '';
+        this.isVisited = false;
+        this.neighbors = [];
+        this.tileSize = tileSize;
+        this.isWalkable = isWalkable;
     }
+    addNeighbors(grid: Tile[][]) {
+        // this.neighbors.push(grid[this.y - 1][this.x - 1])
+        // this.neighbors.push(grid[this.y + 1][this.x + 1])
+        // this.neighbors.push(grid[this.y + 1][this.x])
+        // this.neighbors.push(grid[this.y][this.x + 1])
+        // this.neighbors.push(grid[this.y - 1][this.x])
+        // this.neighbors.push(grid[this.y][this.x - 1])
+        if (this.x !== grid[0].length - 1) this.neighbors.push(grid[this.y][this.x + 1])
+        if (this.x !== 0) this.neighbors.push(grid[this.y][this.x - 1])
+        if (this.y !== grid.length - 1) this.neighbors.push(grid[this.y + 1][this.x])
+        if (this.y !== 0) this.neighbors.push(grid[this.y - 1][this.x])
+    }
+    setTileVisited = () => this.isVisited = true;
+    setWalkable = () => this.isWalkable = !this.isWalkable;
+    setId = (id: string) => this.id = id;
+
 }
 export default Tile;

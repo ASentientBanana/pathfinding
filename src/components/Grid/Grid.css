@@ -1,4 +1,5 @@
 #Grid {
   width: 80vw !important;
   height: 80vh !important;
+  margin: auto;
 }

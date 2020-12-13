@@ -12,7 +12,9 @@ class Tile {
     neighbors: Tile[]
     previusTile: Tile | undefined;
     isWalkable: boolean;
-    constructor(x: number,y: number,  tileSize: number = 25, isWalkable: boolean = true) {
+    isStartTile:boolean;
+    isEndTile:boolean;
+    constructor(x: number,y: number,  tileSize: number = 25, isWalkable: boolean = true,isStartTile:boolean = false,isEndTile:boolean = false) {
         this.f = 0;
         this.g = 0;
         this.h = 0;
@@ -23,6 +25,8 @@ class Tile {
         this.neighbors = [];
         this.tileSize = tileSize;
         this.isWalkable = isWalkable;
+        this.isStartTile = isStartTile;
+        this.isEndTile = isEndTile;
     }
     addNeighbors(grid: Tile[][]) {
         if (this.x !== grid[0].length - 1) this.neighbors.push(grid[this.y][this.x + 1])
@@ -33,6 +37,9 @@ class Tile {
     setTileVisited = () => this.isVisited = true;
     setWalkable = () => this.isWalkable = !this.isWalkable;
     setId = (id: string) => this.id = id;
+    setFCost = ()=>this.f = this.g+this.h
+    setStartTile = ()=> {if(!this.isEndTile) this.isStartTile = true;}
+    setEndTile = ()=> {if(!this.isStartTile) this.isEndTile = true;}
 
 }
 export default Tile;

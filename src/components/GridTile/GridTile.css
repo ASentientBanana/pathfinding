@@ -1,11 +1,11 @@
 .grid-tile {
-  border: solid grey 1px;
-  background-color: red;
+  border: solid #5f787b 1px;
+  background-color: #2d3636;
   text-align: center;
-  font-size: 2em;
+  font-size: 0.5em;
   cursor: pointer;
 }
 
 .obsticle {
-  background-color: black;
+  background-color: white;
 }

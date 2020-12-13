@@ -1,11 +1,4 @@
 #Grid {
-  border: black solid 2px;
-  display: -ms-grid;
-  display: grid;
-  min-height: 100px;
-  -webkit-column-gap: 0;
-          column-gap: 0;
-  row-gap: 0;
-  -ms-grid-rows: auto;
-      grid-template-rows: auto;
+  width: 80vw !important;
+  height: 80vh !important;
 }

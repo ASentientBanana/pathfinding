@@ -4,56 +4,63 @@ import './Grid.css'
 import Tile from '../../util/Tile';
 
 const Grid = () => {
-    const [graph, setGraph] = useState<Tile[][]>();
-    const rows: number = 20;
-    const cols: number = 20;
     const tileSize: number = 25
-    const [visitedNodes, setVisitedNodes] = useState<Tile[]>()
-    const [notVisitedNodes, setNotVisitedNodes] = useState<Tile[]>()
-    const [startNode, setStartNode] = useState<Tile>();
-    const [endNode, setEndNode] = useState<Tile>();
-    const [gridRowCount, setGridRowCount] = useState<string>()
+    const graph = useRef<Tile[][]>();
+    const startNode = useRef<Tile>();
+    const endNode = useRef<Tile>();
+    const [gridStyle, setGridStyle] = useState<any>()
     const gridRef = createRef<HTMLDivElement>();
+    const db =  useRef<any>({})
     const mouseState = useRef(false)
     useEffect(() => {
-        if (!graph) setGraph(new Array(cols));
-        if (graph) {
-            for (let index = 0; index < rows; index++) graph![index] = new Array(rows);
-            for (let col = 0; col < cols; col++) for (let row = 0; row < rows; row++) {
-                if (graph) {
-                    graph![col][row] = new Tile(col, row);
-                    if (notVisitedNodes) setNotVisitedNodes([...notVisitedNodes, graph![col][row]])
-                }
+        const [col, row] = setGrid();
+        if(!graph.current)graph.current = new Array(row)
+        if(graph.current){
+            for (let i = 0; i < row; i++) {
+                graph.current[i]= new Array(col)
+                for (let j = 0; j < graph.current[i].length; j++) {
+                    graph.current[i][j] = new Tile(j,i)
+                }                   
             }
-        }
-        //adds neighbours
-        if (graph) for (let i = 0; i < graph.length; i++) for (let j = 0; j < graph[i].length; j++) graph[i][j].addNeighbors(graph)
-        if (graph) {
-            setStartNode(graph[0][0]);
-            setEndNode(graph[cols - 1][rows - 1]);
-            if (visitedNodes && startNode) setNotVisitedNodes([...visitedNodes, startNode])
-        }
-        setGrid()
-    }, [graph]);
+        }        
+        // // adds neighbours
+        if(graph.current){
+            for (let i = 0; i < graph.current.length; i++) for(let j = 0; j < graph.current[i].length; j++) {
+                graph.current[i][j].addNeighbors(graph.current);
+            } 
+            startNode.current = graph.current[20][15];
+            // endNode.current = graph.current[graph.current.length-1][graph.current[graph.current.length-1].length-1]
+            endNode.current = graph.current[0][0]
+            // db[graph.current[graph.current.length-1][graph.current[graph.current.length-1].length-1].id].style['backgroundColor'] = "cyan";
+        } 
+        
+    }, [graph.current]);
 
 
-    const setGrid = () => {
-        let t = '';
-        for (let i = 0; i < rows; i++) {
-            t += '1fr '
-        }
-        console.log(t);
-        console.log(gridRowCount);
+    const setGrid = (): number[] => {
+        if (gridRef.current) {
+            const widthCount: number = Math.floor(gridRef.current.clientWidth / 25)
+            const heightCount:number = Math.floor(gridRef.current.clientHeight / 25)
+            setGridStyle({
+                display: 'grid',
+                gridTemplateColumns: `repeat(${widthCount},25px)`,
+                gridTemplateRows: `repeat(${43},25px)`,
+                gridColumnGap:'0px',
+                gridRowGap:'0px'
+            })
+            if (widthCount) {
+                return [widthCount, heightCount]
+            }
+            else return [20, 20]
+        } else return [20, 20]
 
-        setGridRowCount(t)
     }
-
-    const db: any = {}
+    
     let open: Tile[] = []
     let closed: Tile[] = []
     const aStar = () => {
-        if (startNode) open.push(startNode)
-
+        if (startNode.current) open.push(startNode.current)
+        
         const interval = setInterval(() => {
             let current: Tile;
             current = open[0]
@@ -61,10 +68,10 @@ const Grid = () => {
                 if (current.f > tile.f) current = tile;
             })
             open = open.filter((tile: Tile) => tile !== current)
-            db[current.id].style['backgroundColor'] = "green";
+            db.current[current.id].style['backgroundColor'] = "green";
             current.setTileVisited()
-            if (endNode != undefined && current === endNode) {
-                if (startNode && endNode) retrace(startNode, endNode);
+            if (endNode.current !== undefined && current === endNode.current) {
+                if (startNode.current && endNode.current) retrace(startNode.current, endNode.current);
                 clearInterval(interval)
                 return;
             }
@@ -74,16 +81,16 @@ const Grid = () => {
                     let movementCost: number;
                     movementCost = current.g + getDistance(current, tile);
                     if (movementCost < tile.g || !open.includes(tile)) {
-                        db[tile.id].style['backgroundColor'] = "purple";
+                        db.current[tile.id].style['backgroundColor'] = "purple";
                         tile.g = movementCost;
-                        if (endNode) tile.h = getDistance(tile, endNode)
+                        if (endNode.current) tile.h = getDistance(tile, endNode.current);
                         tile.previusTile = current;
-                        open.push(tile)
+                        open.push(tile);
                     }
                 }
             })
             if (!(open.length > 0)) clearInterval(interval);
-        }, 3)
+        }, 0)
     }
     const addToClosed = (tile: Tile) => {
         if (closed.includes(tile)) closed = closed.filter((t: Tile) => tile !== t)
@@ -101,23 +108,33 @@ const Grid = () => {
         path.reverse();
         path.forEach((tile: Tile, index: number) => {
             setTimeout(() => {
-                db[tile.id].style['backgroundColor'] = "blue";
-            }, 15 * index)
+                db.current[tile.id].style['backgroundColor'] = "blue";
+            }, 1 * index)
         })
-
+    }
+    const test= ()=>{
+        if(graph.current){
+                for (let j = 0; j < graph.current[0].length; j++) {
+                    setTimeout(()=>{
+                        if(graph.current &&graph.current[0][j].x === 0 && graph.current[0][j].y===0) db.current[graph.current[0][j].id].style['backgroundColor'] = "blue";
+                        else if( graph.current &&graph.current[0][j].x === graph.current.length-1  && graph.current[0][j].y===graph.current[0].length-1)db.current[graph.current[0][j].id].style['backgroundColor'] = "purple";
+                        // else if(graph.current) db[graph.current[0][j].id].style['backgroundColor'] = "yellow";
+                    },30*j)
+            }
+        }
     }
     const getDistance = (tileA: Tile, tileB: Tile): number => {
         const distX = Math.abs(tileA.x - tileB.x);
         const distY = Math.abs(tileA.y - tileB.y);
-        if (distX > distY) return 14 * distX + 10 * (distX - distY)
+        if (distX > distY) return 14 * distX + 10 * (distX - distY);
         else return 14 * distY + 10 * (distY - distX)
     }
-    const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => { db[tile.id] = ref.current; }
-
+    const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => { db.current[tile.id] = ref.current; }
+    // style={{ gridTemplateColumns: `${gridRowCount}`, gridTemplateRows: `${gridRowCount}`, rowGap: "0", columnGap: "0" }} 
     return (
         <div>
-            <div id="Grid" style={{ gridTemplateColumns: `${gridRowCount}`, gridTemplateRows: `${gridRowCount}`, rowGap: "0", columnGap: "0" }} ref={gridRef} onMouseDown={() => { mouseState.current = true; }} onMouseLeave={() => mouseState.current = false} onMouseUp={() => mouseState.current = false}>
-                {graph?.map((g) => g.map((tile) => <GridTile key={Math.random() * 100000} close={addToClosed} tile={tile} rowTileCount={rows} tileSize={tileSize} saveRef={saveRef} mouseState={mouseState} />))}
+            <div id="Grid" style={gridStyle} ref={gridRef} onMouseDown={() => { mouseState.current = true; }} onMouseLeave={() => mouseState.current = false} onMouseUp={() => mouseState.current = false}>
+                {graph.current?.map((g: any, i: number) => g.map((tile: any) => <GridTile key={Math.random() * 100000} close={addToClosed} tile={tile}  saveRef={saveRef} mouseState={mouseState} />))}
             </div>
             <button onClick={aStar}>Start</button>
 

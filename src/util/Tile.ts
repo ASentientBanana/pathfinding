@@ -12,7 +12,7 @@ class Tile {
     neighbors: Tile[]
     previusTile: Tile | undefined;
     isWalkable: boolean;
-    constructor(y: number, x: number, tileSize: number = 25, isWalkable: boolean = true) {
+    constructor(x: number,y: number,  tileSize: number = 25, isWalkable: boolean = true) {
         this.f = 0;
         this.g = 0;
         this.h = 0;
@@ -25,12 +25,6 @@ class Tile {
         this.isWalkable = isWalkable;
     }
     addNeighbors(grid: Tile[][]) {
-        // this.neighbors.push(grid[this.y - 1][this.x - 1])
-        // this.neighbors.push(grid[this.y + 1][this.x + 1])
-        // this.neighbors.push(grid[this.y + 1][this.x])
-        // this.neighbors.push(grid[this.y][this.x + 1])
-        // this.neighbors.push(grid[this.y - 1][this.x])
-        // this.neighbors.push(grid[this.y][this.x - 1])
         if (this.x !== grid[0].length - 1) this.neighbors.push(grid[this.y][this.x + 1])
         if (this.x !== 0) this.neighbors.push(grid[this.y][this.x - 1])
         if (this.y !== grid.length - 1) this.neighbors.push(grid[this.y + 1][this.x])

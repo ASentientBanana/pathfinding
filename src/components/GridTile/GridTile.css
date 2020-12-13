@@ -1,9 +1,8 @@
 .grid-tile {
+  border: solid grey 1px;
   background-color: red;
   text-align: center;
   font-size: 2em;
-  width: 5px;
-  height: 5px;
   cursor: pointer;
 }
 

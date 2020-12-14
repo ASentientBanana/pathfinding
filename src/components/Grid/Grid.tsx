@@ -5,7 +5,6 @@ import Tile from '../../util/Tile';
 
 
 const Grid = () => {
-    const tileSize: number = 25
     const graph = useRef<Tile[][]>();
     const startNode = useRef<Tile>();
     const endNode = useRef<Tile>();
@@ -13,8 +12,6 @@ const Grid = () => {
     const gridRef = createRef<HTMLDivElement>();
     const db = useRef<any>({})
     const mouseState = useRef(false)
-    const isSettingStartTile = useRef<boolean>(false)
-    const isSettingEndTile = useRef<boolean>(false)
     const colors = {
         bakgroundMainColor: "#262b2b",
         bakgroundColor: "#2d3636",
@@ -40,10 +37,21 @@ const Grid = () => {
             for (let i = 0; i < graph.current.length; i++) for (let j = 0; j < graph.current[i].length; j++) {
                 graph.current[i][j].addNeighbors(graph.current);
             }
-            setTimeout(() => {
-                setStartEndTile(0, 0, true)
-                setStartEndTile(20, 20, false, true)
-            }, 1000)
+            const tmpinterval = setInterval(() => {
+                try {
+                    if (graph.current) {
+
+                        startNode.current = graph.current[0][0]
+                        if (startNode.current && db.current) db.current[startNode.current.id].style['backgroundColor'] = colors.accentGreenColor;
+
+                        endNode.current = graph.current[graph.current.length - 1][graph.current[graph.current.length - 1].length - 1]
+                        if (endNode.current && db.current) db.current[endNode.current.id].style['backgroundColor'] = colors.accentRedColor;
+                        clearInterval(tmpinterval)
+                    }
+                } catch (error) {
+                }
+            }, 200)
+
         }
 
     }, [graph.current]);
@@ -98,6 +106,7 @@ const Grid = () => {
                     } else {
                         tile.g = movementCost;
                         tmp.push(tile)
+                        // open.push(tile)
                     }
                     if (endNode.current) tile.h = getHeuristic(tile, endNode.current)
                     tile.setFCost()
@@ -106,8 +115,6 @@ const Grid = () => {
                     tmp = tmp.sort((a, b) => a.f - b.f)
                     open.push(tmp[0])
                     //Sumnjivo
-
-
                 }
             })
             if (!(open.length > 0)) clearInterval(interval);
@@ -132,24 +139,13 @@ const Grid = () => {
         path.forEach((tile: Tile, index: number) => {
             setTimeout(() => {
                 db.current[tile.id].style['backgroundColor'] = colors.accentGoldColor;
-                db.current[tile.id].style['border'] = `${colors.accentGreyColor} 1px solid`;
+                db.current[tile.id].style['border'] = `${colors.accentGreyColor} 0.5px solid`;
             }, 50 * index)
         })
     }
     const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => { db.current[tile.id] = ref.current; }
-    const setStartEndTile = (x: number, y: number, isSettingStart: boolean = false, isSettingEnd: boolean = false) => {
-        if (graph.current) {
 
-            if (isSettingEnd) {
-                endNode.current = graph.current[y][x]
-                if (endNode.current && db.current) db.current[endNode.current.id].style['backgroundColor'] = colors.accentRedColor;
-            }
-            if (isSettingStart) {
-                startNode.current = graph.current[y][x]
-            }
-            if (startNode.current && db.current) db.current[startNode.current.id].style['backgroundColor'] = colors.accentGreenColor;
-        }
-    }
+
     return (
         <div>
             <div id="Grid" style={gridStyle} ref={gridRef}
@@ -158,8 +154,6 @@ const Grid = () => {
                 onMouseUp={() => mouseState.current = false}>
                 {graph.current?.map((g: any, i: number) => g.map((tile: any) =>
                     <GridTile
-                        startTilleState={isSettingStartTile.current}
-                        endTileState={isSettingEndTile.current}
                         key={Math.random() * 100000}
                         close={addToClosed}
                         tile={tile}
@@ -167,7 +161,7 @@ const Grid = () => {
                         mouseState={mouseState} />))}
             </div>
             <button onClick={aStar}>Start</button>
-
+            {/* ()=>aStar(startNode.current,endNode.current,open,closed,db,colors) */}
         </div>
     );
 }

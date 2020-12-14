@@ -9,10 +9,8 @@ interface prop {
     tile: Tile,
     close: Function,
     saveRef: Function,
-    startTilleState: boolean,
-    endTileState: boolean
 }
-const GridTile = ({ tile, saveRef, close, mouseState, startTilleState, endTileState }: prop) => {
+const GridTile = ({ tile, saveRef, close, mouseState}: prop) => {
     // {`${tile.isVisited}`}
     const tileRef = createRef<HTMLDivElement>();
     const tileId = useRef<string>(`node-${tile.y}-${tile.x}`);
@@ -31,18 +29,11 @@ const GridTile = ({ tile, saveRef, close, mouseState, startTilleState, endTileSt
         }
     }
     const setObsticleOnMouseDown = () => {
-        if (startTilleState) {
-
-        } else if (endTileState) {
-
-        }
-        else {
+        
             tile.setWalkable();
             close(tile)
             if (obsticle === 'null') setObsticle('obsticle')
             else setObsticle('null')
-        }
-
     }
     let colorStart: string = "";
     return <div className={`grid-tile ${obsticle}`} id={tileId.current} ref={tileRef} onClick={setObsticleOnMouseDown}

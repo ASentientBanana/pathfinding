@@ -1,16 +1,19 @@
-import React, { useState, useEffect, createRef, useRef } from 'react';
+import React, { useState, useEffect, createRef, useRef, MutableRefObject } from 'react';
 import './GridTile.css';
 import Tile from '../../util/Tile';
 interface style {
     backgroundColor: string
 }
-interface prop {
+interface GridTile {
     mouseState: any,
     tile: Tile,
+    isMovingStart: MutableRefObject<boolean>,
+    isMovingEnd: MutableRefObject<boolean>,
     close: Function,
     saveRef: Function,
+    moveStartEnd: Function
 }
-const GridTile = ({ tile, saveRef, close, mouseState}: prop) => {
+const GridTile = ({ tile, saveRef, close, mouseState, isMovingStart, isMovingEnd, moveStartEnd }: GridTile) => {
     // {`${tile.isVisited}`}
     const tileRef = createRef<HTMLDivElement>();
     const tileId = useRef<string>(`node-${tile.y}-${tile.x}`);
@@ -28,17 +31,20 @@ const GridTile = ({ tile, saveRef, close, mouseState}: prop) => {
             tile.style.width = `${25}px`
         }
     }
-    const setObsticleOnMouseDown = () => {
-        
+    const mouseDownHandler = () => {
+        if (isMovingStart.current || isMovingEnd.current) moveStartEnd(tile.x, tile.y);
+        else {
+            //set obsticle
             tile.setWalkable();
             close(tile)
             if (obsticle === 'null') setObsticle('obsticle')
             else setObsticle('null')
+        }
     }
     let colorStart: string = "";
-    return <div className={`grid-tile ${obsticle}`} id={tileId.current} ref={tileRef} onClick={setObsticleOnMouseDown}
+    return <div className={`grid-tile ${obsticle}`} id={tileId.current} ref={tileRef} onClick={mouseDownHandler}
         onMouseOver={() => {
-            if (mouseState.current) setObsticleOnMouseDown()
+            if (mouseState.current) mouseDownHandler()
         }}
         style={{ backgroundColor: colorStart }}
     ></div>

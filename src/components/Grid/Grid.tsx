@@ -2,6 +2,9 @@ import React, { useState, useEffect, createRef, useRef } from 'react';
 import GridTile from '../GridTile/GridTile'
 import './Grid.css'
 import Tile from '../../util/Tile';
+import aStar from '../../util/Astar';
+import djikstra from '../../util/Djikstra';
+const Heap = require('heap')
 
 
 const Grid = () => {
@@ -12,6 +15,8 @@ const Grid = () => {
     const gridRef = createRef<HTMLDivElement>();
     const db = useRef<any>({})
     const mouseState = useRef(false)
+    const isMovingStart = useRef<boolean>(false)
+    const isMovingEnd = useRef<boolean>(false)
     const colors = {
         bakgroundMainColor: "#262b2b",
         bakgroundColor: "#2d3636",
@@ -20,6 +25,7 @@ const Grid = () => {
         accentGreenColor: "#66ff66",
         accentRedColor: "#cc2900",
     };
+    const openHeap = new Heap((a: Tile, b: Tile) => a.f - b.f);
 
     useEffect(() => {
         const [col, row] = setGrid();
@@ -51,11 +57,8 @@ const Grid = () => {
                 } catch (error) {
                 }
             }, 200)
-
         }
-
     }, [graph.current]);
-
 
     const setGrid = (): number[] => {
         if (gridRef.current) {
@@ -78,74 +81,34 @@ const Grid = () => {
 
     let open: Tile[] = []
     let closed: Tile[] = []
-    const aStar = () => {
-        if (startNode.current) open.push(startNode.current)
-        const interval = setInterval(() => {
-            let current: Tile;
-            open = open.sort((a, b) => a.f - b.f)
-            console.log(open[0].f);
 
-            current = open[0]
-            open.shift()
-            if (!current.isEndTile || !current.isStartTile) db.current[current.id].style['backgroundColor'] = colors.accentGreyColor;
-            db.current[current.id].style['border'] = `${colors.accentGoldColor} 0.5px solid`;
-            current.setTileVisited()
-            if (endNode.current !== undefined && current === endNode.current) {
-                if (startNode.current && endNode.current) retrace(startNode.current, endNode.current);
-                clearInterval(interval)
-                return;
-            }
-            closed.push(current)
-            let tmp: Tile[] = []
-            current.neighbors.forEach((tile: Tile) => {
-                if (!closed.includes(tile)) {
-                    let movementCost: number;
-                    movementCost = current.g + 1;
-                    if (open.includes(tile)) {
-                        if (movementCost < tile.g) tile.g = movementCost
-                    } else {
-                        tile.g = movementCost;
-                        tmp.push(tile)
-                        // open.push(tile)
-                    }
-                    if (endNode.current) tile.h = getHeuristic(tile, endNode.current)
-                    tile.setFCost()
-                    tile.previusTile = current;
-                    db.current[tile.id].style['backgroundColor'] = "#afc7f3";
-                    tmp = tmp.sort((a, b) => a.f - b.f)
-                    open.push(tmp[0])
-                    //Sumnjivo
-                }
-            })
-            if (!(open.length > 0)) clearInterval(interval);
-        }, 1)
-    }
     const addToClosed = (tile: Tile) => {
         if (closed.includes(tile)) closed = closed.filter((t: Tile) => tile !== t)
         else closed.push(tile)
 
     }
-    const getHeuristic = (tileA: Tile, tileB: Tile) => Math.abs(tileA.x - tileB.x) + Math.abs(tileA.y - tileB.y)
 
-    const retrace = (start: Tile, end: Tile) => {
-        const path: Tile[] = [];
-        let current: Tile = end;
-        while (current !== start) {
-            path.push(current)
-            if (current.previusTile) current = current.previusTile;
-        }
-        path.push(start)
-        path.reverse();
-        path.forEach((tile: Tile, index: number) => {
-            setTimeout(() => {
-                db.current[tile.id].style['backgroundColor'] = colors.accentGoldColor;
-                db.current[tile.id].style['border'] = `${colors.accentGreyColor} 0.5px solid`;
-            }, 50 * index)
-        })
-    }
     const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => { db.current[tile.id] = ref.current; }
-
-
+    const tileOnClickHandler = (x: number, y: number) => {
+        if (isMovingStart.current) {
+            if (startNode.current && graph.current) {
+                db.current[startNode.current.id].style['backgroundColor'] = colors.bakgroundColor;
+                startNode.current = graph.current[y][x];
+                db.current[startNode.current.id].style['backgroundColor'] = colors.accentGreenColor;
+            }
+        } else if (isMovingEnd.current) {
+            if (endNode.current && graph.current) {
+                db.current[endNode.current.id].style['backgroundColor'] = colors.bakgroundColor;
+                endNode.current = graph.current[y][x];
+                db.current[endNode.current.id].style['backgroundColor'] = colors.accentRedColor;
+            }
+        }
+        isMovingStart.current = false;
+        isMovingEnd.current = false;
+    }
+    const updateTile = (id: string, fCost: number, hCost: number, gCost: number) => {
+        db.current[id].innerText = `f:${fCost} h:${hCost} g:${gCost}`;
+    }
     return (
         <div>
             <div id="Grid" style={gridStyle} ref={gridRef}
@@ -155,13 +118,29 @@ const Grid = () => {
                 {graph.current?.map((g: any, i: number) => g.map((tile: any) =>
                     <GridTile
                         key={Math.random() * 100000}
+                        moveStartEnd={tileOnClickHandler}
                         close={addToClosed}
                         tile={tile}
                         saveRef={saveRef}
+                        isMovingStart={isMovingStart}
+                        isMovingEnd={isMovingEnd}
                         mouseState={mouseState} />))}
+
             </div>
-            <button onClick={aStar}>Start</button>
-            {/* ()=>aStar(startNode.current,endNode.current,open,closed,db,colors) */}
+            <button onClick={() => {
+                if (startNode.current && endNode.current) aStar(startNode.current, endNode.current, openHeap, closed, db.current, colors, updateTile)
+            }}>Start Astar</button>
+            <button onClick={() => {
+                if (startNode.current && endNode.current) djikstra(startNode.current, endNode.current, open, closed, db.current, colors)
+            }}>Djikstra</button>
+            <button onClick={() => {
+                isMovingEnd.current = false;
+                isMovingStart.current = true;
+            }}>Move Start</button>
+            <button onClick={() => {
+                isMovingStart.current = false
+                isMovingEnd.current = true;
+            }}>Move End</button>
         </div>
     );
 }

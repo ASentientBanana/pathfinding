@@ -3,8 +3,11 @@
     border: solid $accentGreyColor 1px;
     background-color: $bakgroundColor;
     text-align: center;
-    font-size: 0.5em;
+    font-size: 0.4em;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    color: white;
 }
 .obsticle{
     background-color: white;

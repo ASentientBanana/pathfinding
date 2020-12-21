@@ -4,7 +4,7 @@ import './Grid.css'
 import Tile from '../../util/Tile';
 import aStar from '../../util/Astar';
 import djikstra from '../../util/Djikstra';
-const Heap = require('heap')
+const Heap = require('heap');
 
 
 const Grid = () => {
@@ -25,7 +25,7 @@ const Grid = () => {
         accentGreenColor: "#66ff66",
         accentRedColor: "#cc2900",
     };
-    const openHeap = new Heap((a: Tile, b: Tile) => a.f - b.f);
+    const openHeap = new Heap((a: Tile, b: Tile) =>  a.f -  b.f );
 
     useEffect(() => {
         const [col, row] = setGrid();

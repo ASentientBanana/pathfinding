@@ -1,14 +1,16 @@
-@import '../../static/colors.scss';
-.grid-tile{
-    border: solid $accentGreyColor 1px;
-    background-color: $bakgroundColor;
-    text-align: center;
-    font-size: 0.4em;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    color: white;
+@import "../../static/colors.scss";
+.grid-tile {
+  border: solid $accentGreyColor 1px;
+  background-color: $bakgroundColor;
+  text-align: center;
+  font-size: 0.4em;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  color: white;
 }
-.obsticle{
-    background-color: white;
+.obsticle {
+  background-color: white;
+}
+.visited {
 }

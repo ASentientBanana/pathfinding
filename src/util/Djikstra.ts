@@ -1,47 +1,46 @@
 import React from "react";
 import Tile from "./Tile";
 
-const djikstra = (
+const sleep = (ms: any) => new Promise((res) => setTimeout(res, ms));
+
+const djikstra = async (
   startNode: Tile,
   endNode: Tile,
-  open: Tile[],
+  open: any,
   closed: Tile[],
   db: any,
   colors: any
 ) => {
   if (startNode) open.push(startNode);
 
-  const interval = setInterval(() => {
+  while (open.nodes.length > 0) {
+    await sleep(1);
     let current: Tile;
-    current = open[0];
-    open.forEach((tile: Tile, index: number) => {
-      if (current.f > tile.f) current = tile;
-    });
-    open = open.filter((tile: Tile) => tile !== current);
-    db[current.id].style["backgroundColor"] = "green";
+    current = open.peek();
+
+    db[current.id].style["backgroundColor"] = colors.accentGreyColor;
+    db[current.id].style["border"] = `${colors.accentGoldColor} 0.5px solid`;
     current.setTileVisited();
-    if (endNode != undefined && current === endNode) {
+    if (endNode !== undefined && current === endNode) {
       if (startNode && endNode) retrace(startNode, endNode, db, colors);
-      clearInterval(interval);
       return;
     }
-    open = open.filter((tile: Tile) => tile !== current);
+    open.pop();
     closed.push(current);
+    // eslint-disable-next-line no-loop-func
     current.neighbors.forEach((tile: Tile) => {
       if (!closed.includes(tile)) {
         let movementCost: number;
-        movementCost = current.g + getDistance(current, tile);
-        if (movementCost < tile.g || !open.includes(tile)) {
-          db[tile.id].style["backgroundColor"] = "purple";
+        movementCost = current.g + 1;
+        if (movementCost < tile.g || !open.nodes.includes(tile)) {
+          db[tile.id].style["backgroundColor"] = "#afc7f3";
           tile.g = movementCost;
-          if (endNode) tile.h = getDistance(tile, endNode);
           tile.previusTile = current;
           open.push(tile);
         }
       }
     });
-    if (!(open.length > 0)) clearInterval(interval);
-  }, 3);
+  }
 };
 
 const retrace = (start: Tile, end: Tile, db: any, colors: any) => {
@@ -61,10 +60,3 @@ const retrace = (start: Tile, end: Tile, db: any, colors: any) => {
   });
 };
 export default djikstra;
-
-const getDistance = (tileA: Tile, tileB: Tile): number => {
-  const distX = Math.abs(tileA.x - tileB.x);
-  const distY = Math.abs(tileA.y - tileB.y);
-  if (distX > distY) return 14 * distX + 10 * (distX - distY);
-  else return 14 * distY + 10 * (distY - distX);
-};

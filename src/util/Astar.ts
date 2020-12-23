@@ -1,7 +1,8 @@
 import React, { FunctionComponent } from "react";
 import Tile from "./Tile";
+const sleep = (ms: any) => new Promise((res) => setTimeout(res, ms));
 
-const aStar = (
+const aStar = async (
   startNode: Tile,
   endNode: Tile,
   open: any,
@@ -11,7 +12,8 @@ const aStar = (
   updateTile: any
 ) => {
   if (startNode) open.push(startNode);
-  const interval = setInterval(() => {
+  while (open.nodes.length > 0) {
+    await sleep(1);
     let current: Tile;
     current = open.peek();
     if (!current.isEndTile || !current.isStartTile)
@@ -20,7 +22,6 @@ const aStar = (
     current.setTileVisited();
     if (endNode !== undefined && current === endNode) {
       if (startNode && endNode) retrace(startNode, endNode, db, colors);
-      clearInterval(interval);
       return;
     }
     open.pop();
@@ -28,31 +29,30 @@ const aStar = (
     current.neighbors.forEach((neighborTile: Tile) => {
       if (!closed.includes(neighborTile)) {
         if (neighborTile.g === 0) {
-          neighborTile.setGcost(current.g + 1);
+          neighborTile.setGcost(current.g + 0.2);
           neighborTile.previusTile = current;
-        } else if (neighborTile.g > current.g + 1) {
-          neighborTile.setGcost(current.g + 1);
+        } else if (neighborTile.g > current.g + 0.2) {
+          neighborTile.setGcost(current.g + 0.2);
           neighborTile.previusTile = current;
         }
-
         neighborTile.setHcost(getHeuristic(neighborTile, endNode));
         neighborTile.setFCost();
         db[neighborTile.id].style["backgroundColor"] = "#afc7f3";
-        if (!open.nodes.includes(neighborTile)) open.push(neighborTile);
+        if (!open.nodes.includes(neighborTile)) {
+          open.push(neighborTile);
+        }
       }
     });
-    if (!(open.nodes.length > 0)) clearInterval(interval);
-  }, 3);
+  }
 };
 
-// const getHeuristic = (tileA: Tile, tileB: Tile) =>
-//   Math.abs(tileA.x - tileB.x) + Math.abs(tileA.y - tileB.y);
 function getHeuristic(tileA: Tile, tileB: Tile) {
-  const D = 1;
-  const D2 = Math.sqrt(2);
+  const D2 = 1.4142135623730951;
   const dx = Math.abs(tileA.x - tileB.x);
   const dy = Math.abs(tileA.y - tileB.y);
-  return D * (dx + dy) + (D2 - 2 * D) * Math.min(dx, dy);
+  return dx + dy + (D2 - 2) * Math.min(dx, dy);
+  // alternativa
+  // return D * (dx + dy) + (D2 - 2 * D) * Math.min(dx, dy);
 }
 
 const retrace = (start: Tile, end: Tile, db: any, colors: any) => {

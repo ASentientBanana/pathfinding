@@ -29,10 +29,10 @@ const aStar = async (
     current.neighbors.forEach((neighborTile: Tile) => {
       if (!closed.includes(neighborTile)) {
         if (neighborTile.g === 0) {
-          neighborTile.setGcost(current.g + 0.2);
+          neighborTile.setGcost(current.g + 0.5);
           neighborTile.previusTile = current;
-        } else if (neighborTile.g > current.g + 0.2) {
-          neighborTile.setGcost(current.g + 0.2);
+        } else if (neighborTile.g > current.g + 0.5) {
+          neighborTile.setGcost(current.g + 0.5);
           neighborTile.previusTile = current;
         }
         neighborTile.setHcost(getHeuristic(neighborTile, endNode));

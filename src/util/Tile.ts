@@ -1,5 +1,3 @@
-import React from "react";
-
 class Tile {
   x: number;
   y: number;
@@ -36,12 +34,10 @@ class Tile {
     this.isEndTile = isEndTile;
   }
   addNeighbors(grid: Tile[][]) {
-    if (this.x !== grid[0].length - 1)
-      this.neighbors.push(grid[this.y][this.x + 1]);
-    if (this.x !== 0) this.neighbors.push(grid[this.y][this.x - 1]);
-    if (this.y !== grid.length - 1)
-      this.neighbors.push(grid[this.y + 1][this.x]);
+    if (this.y !== grid.length - 1)   this.neighbors.push(grid[this.y + 1][this.x]);
+    if (this.x !== grid[0].length - 1) this.neighbors.push(grid[this.y][this.x + 1]);
     if (this.y !== 0) this.neighbors.push(grid[this.y - 1][this.x]);
+    if (this.x !== 0) this.neighbors.push(grid[this.y][this.x - 1]);
   }
   setTileVisited = () => (this.isVisited = true);
   setWalkable = () => (this.isWalkable = !this.isWalkable);

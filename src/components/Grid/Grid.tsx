@@ -4,221 +4,292 @@ import "./Grid.css";
 import Tile from "../../util/Tile";
 import aStar from "../../util/Astar";
 import djikstra from "../../util/Djikstra";
+import bfs from "../../util/BFS";
+import { moveStartColor } from "../../util/Utility";
+const sleep = (ms: any) => new Promise((res) => setTimeout(res, ms));
+
 const Heap = require("heap");
 
-const Grid = () => {
-  const graph = useRef<Tile[][]>();
-  const startNode = useRef<Tile>();
-  const endNode = useRef<Tile>();
-  const [gridStyle, setGridStyle] = useState<any>();
-  const gridRef = createRef<HTMLDivElement>();
-  const db = useRef<any>({});
-  const mouseState = useRef(false);
-  const isMovingStart = useRef<boolean>(false);
-  const isMovingEnd = useRef<boolean>(false);
-  const walls = useRef<Tile[]>([]);
-  const [rend, setRend] = useState<boolean>(false);
-  const clickable = useRef<boolean>(false);
-  const colors = {
-    bakgroundMainColor: "#262b2b",
-    bakgroundColor: "#2d3636",
-    accentGoldColor: "#eab354",
-    accentGreyColor: "#5f787b",
-    accentGreenColor: "#66ff66",
-    accentRedColor: "#cc2900",
-  };
-  const openHeapAstar = new Heap((a: Tile, b: Tile) => a.f - b.f);
-  const openHeapDjikstra = new Heap((a: Tile, b: Tile) => a.g - b.g);
+const Grid = (props: any) => {
+	const graph = useRef<Tile[][]>();
+	const startNode: React.MutableRefObject<Tile | undefined> = props.startTile;
+	const endNode: React.MutableRefObject<Tile | undefined> = props.endTile;
+	const [gridStyle, setGridStyle] = useState<any>();
+	const gridRef = createRef<HTMLDivElement>();
+	const db = useRef<any>({});
+	const mouseState = useRef(false);
+	const isMovingStart = useRef<boolean>(false);
+	const isMovingEnd = useRef<boolean>(false);
+	const [rend, setRend] = useState<boolean>(false);
+	const clickable = useRef<boolean>(false);
+	const openHeapAstar = new Heap((a: Tile, b: Tile) => a.f - b.f);
+	const openHeapDjikstra = new Heap((a: Tile, b: Tile) => a.g - b.g);
+	let openList: Tile[] = [];
+	const closed = useRef<Tile[]>([]);
 
-  useEffect(() => setup(), [graph.current, rend]);
-  const setup = () => {
-    const [col, row] = setGrid();
-    if (!graph.current) graph.current = new Array(row);
-    if (graph.current) {
-      for (let i = 0; i < row; i++) {
-        graph.current[i] = new Array(col);
-        for (let j = 0; j < graph.current[i].length; j++) {
-          graph.current[i][j] = new Tile(j, i);
-        }
-      }
-    }
-    // // adds neighbours
-    if (graph.current) {
-      for (let i = 0; i < graph.current.length; i++)
-        for (let j = 0; j < graph.current[i].length; j++) {
-          graph.current[i][j].addNeighbors(graph.current);
-        }
-      const tmpinterval = setInterval(() => {
-        try {
-          if (graph.current) {
-            startNode.current = graph.current[5][5];
-            if (startNode.current && db.current)
-              db.current[startNode.current.id].style["backgroundColor"] =
-                colors.accentGreenColor;
+	useEffect(() => { setup() }, [graph.current, rend]);
+	const setup = async () => {
+		const [col, row] = setGrid();
+		if (!graph.current) graph.current = new Array(row);
+		if (graph.current) {
+			for (let i = 0; i < row; i++) {
+				graph.current[i] = new Array(col);
+				for (let j = 0; j < graph.current[i].length; j++) {
+					graph.current[i][j] = new Tile(j, i);
+				}
+			}
+		}
+		// // adds neighbours and walls
+		await sleep(500)
+		if (graph.current) {
+			for (let i = 0; i < graph.current.length; i++)
+				for (let j = 0; j < graph.current[i].length; j++) {
+					graph.current[i][j].addNeighbors(graph.current);
+				}
+			try {
+				if (graph.current && db.current) {
+					if (!startNode.current) setStart()
+					else setStart(startNode.current.x, startNode.current.y, true)
+					if (!endNode.current) setEnd()
+					else setEnd(endNode.current.x, endNode.current.y, true)
+					console.log(endNode);
 
-            endNode.current =
-              graph.current[graph.current.length - 1][
-                graph.current[graph.current.length - 1].length - 1
-              ];
-            if (endNode.current && db.current)
-              db.current[endNode.current.id].style["backgroundColor"] =
-                colors.accentRedColor;
-            clearInterval(tmpinterval);
-          }
-        } catch (error) {}
-      }, 20);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    clickable.current = true;
-  };
+				}
+				
+			} catch (error) { }
+			if(props.obsticlePos.current.length > 0){
+				props.obsticlePos.current.forEach((tile:Tile)=>{
+					tileState(tile,'obsticle')
+					if(graph.current)closed.current.push(graph.current[tile.y][tile.x])
+				})
+			}
+			console.log(props.obsticlePos.current.length);
+		}
 
-  const setGrid = (): number[] => {
-    if (gridRef.current) {
-      const widthCount: number = Math.floor(gridRef.current.clientWidth / 25);
-      const heightCount: number = Math.floor(gridRef.current.clientHeight / 25);
-      setGridStyle({
-        display: "grid",
-        gridTemplateColumns: `repeat(${widthCount},25px)`,
-        gridTemplateRows: `repeat(${heightCount},25px)`,
-        gridColumnGap: "0px",
-        gridRowGap: "0px",
-      });
-      if (widthCount) {
-        return [widthCount, heightCount];
-      } else return [20, 20];
-    } else return [20, 20];
-  };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		clickable.current = true;
 
-  let closed: Tile[] = [];
+	};
+	const setStart = (x: number = 5, y: number = 5, isRedraw: boolean = false) => {
+		try {
+			if (startNode.current && isRedraw) {
+				startNode.current.isEndTile = false;
+				db.current[startNode.current.id].classList.remove('startTile')
+			}
+			startNode.current = graph.current![y][x]
+				startNode.current.isEndTile = true;
+				db.current[startNode.current.id].classList.add('startTile')
+		} catch { }
 
-  const addToClosed = (tile: Tile) => {
-    if (closed.includes(tile)) {
-      closed = closed.filter((t: Tile) => tile !== t);
-      walls.current.filter((t: Tile) => tile !== t);
-    } else {
-      closed.push(tile);
-      walls.current.push(tile);
-    }
-  };
+		console.log(startNode.current);
+	}
+	const setEnd = (x: number = 5, y: number = 9, isRedraw: boolean = false) => {
+		try {
+			if (endNode.current && isRedraw) {
+				db.current[endNode.current.id].classList.remove('endTile')
+				endNode.current.isEndTile = false;
+			}
+			endNode.current = graph.current![y][x]
+			if (endNode.current) {
+				db.current[endNode.current.id].classList.add('endTile')
+				endNode.current.isEndTile = true;
+			}
+		} catch (error) { }
+	}
+	const tileState = (tile: Tile, className: string) => {
+		// .obsticle  .visiting .visited 
+		const x =db.current[tile.id]
+		console.log(x.className);
+		x.classList.add(className)
+	}
+	const clearTileClass = (tile:Tile) =>{
+		db.current[tile.id].className = 'grid-tile'
+	}
+	const setGrid = (): number[] => {
+		if (gridRef.current) {
+			const widthCount: number = Math.floor(gridRef.current.clientWidth / 25);
+			const heightCount: number = Math.floor(gridRef.current.clientHeight / 25);
+			setGridStyle({
+				display: "grid",
+				gridTemplateColumns: `repeat(${widthCount},25px)`,
+				gridTemplateRows: `repeat(${heightCount},25px)`,
+				gridColumnGap: "0px",
+				gridRowGap: "0px",
+			});
+			if (widthCount) {
+				return [widthCount, heightCount];
+			} else return [20, 20];
+		} else return [20, 20];
+	};
 
-  const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => {
-    db.current[tile.id] = ref.current;
-  };
-  const tileOnClickHandler = (x: number, y: number) => {
-    if (isMovingStart.current) {
-      if (startNode.current && graph.current) {
-        db.current[startNode.current.id].style["backgroundColor"] =
-          colors.bakgroundColor;
-        startNode.current = graph.current[y][x];
-        db.current[startNode.current.id].style["backgroundColor"] =
-          colors.accentGreenColor;
-      }
-    } else if (isMovingEnd.current) {
-      if (endNode.current && graph.current) {
-        db.current[endNode.current.id].style["backgroundColor"] =
-          colors.bakgroundColor;
-        endNode.current = graph.current[y][x];
-        db.current[endNode.current.id].style["backgroundColor"] =
-          colors.accentRedColor;
-      }
-    }
-    isMovingStart.current = false;
-    isMovingEnd.current = false;
-  };
-  const updateTile = (
-    id: string,
-    fCost: number,
-    hCost: number,
-    gCost: number
-  ) => {
-    db.current[id].innerText = `f:${fCost} h:${hCost} g:${gCost}`;
-  };
-  const clearBoard = () => {
-    console.log("rend it daddy");
-    setRend(!rend);
-  };
-  return (
-    <div>
-      <div
-        id="Grid"
-        style={gridStyle}
-        ref={gridRef}
-        onMouseDown={() => {
-          mouseState.current = true;
-        }}
-        onMouseLeave={() => (mouseState.current = false)}
-        onMouseUp={() => (mouseState.current = false)}
-      >
-        {graph.current?.map((g: any, i: number) =>
-          g.map((tile: any) => (
-            <GridTile
-              key={Math.random() * 100000}
-              moveStartEnd={tileOnClickHandler}
-              close={addToClosed}
-              tile={tile}
-              saveRef={saveRef}
-              isMovingStart={isMovingStart}
-              isMovingEnd={isMovingEnd}
-              mouseState={mouseState}
-            />
-          ))
-        )}
-      </div>
-      <button
-        onClick={() => {
-          if (!clickable.current) return;
-          if (startNode.current && endNode.current)
-            aStar(
-              startNode.current,
-              endNode.current,
-              openHeapAstar,
-              closed,
-              db.current,
-              colors,
-              updateTile
-            );
-          clickable.current = false;
-        }}
-      >
-        Start Astar
+	const addToClosed = (tile: Tile) => {
+		if (closed.current.includes(tile)) {
+			closed.current = closed.current.filter((t: Tile) => tile !== t);
+		} else {
+			closed.current.push(tile);
+		}
+	};
+
+	const saveRef = (ref: React.RefObject<HTMLDivElement>, tile: Tile) => {
+		db.current[tile.id] = ref.current;
+	};
+	const tileOnClickHandler = (x: number, y: number) => {
+		if (isMovingStart.current) {
+			if (startNode.current && graph.current) setStart(x, y, true)
+		} else if (isMovingEnd.current) {
+			if (endNode.current && graph.current) setEnd(x, y, true)
+		} else {
+			if (graph.current) tileState(graph.current[y][x], 'obsticle')
+		}
+		isMovingStart.current = false;
+		isMovingEnd.current = false;
+	}
+	const updateTile = (
+		id: string,
+		fCost: number,
+		hCost: number,
+		gCost: number
+	) => {
+		db.current[id].innerText = `f:${fCost} h:${hCost} g:${gCost}`;
+	};
+	const clearBoard = () => {
+		if(graph.current)graph.current.forEach((r,index) => {
+			r.forEach((tile:Tile)=>{
+				if(!tile.isStartTile && !tile.isEndTile) {
+					clearTileClass(tile);
+					closed.current = closed.current.filter((tileC:Tile)=> tile === tileC)
+				}else{
+					db.current[tile.id].classList.remove('path')
+					db.current[tile.id].classList.remove('visited')
+					db.current[tile.id].classList.remove('visiting')
+				}
+			})
+			
+		});
+		clickable.current = true;
+	};
+	const clearBordWithWalls = () => {
+		if(graph.current)graph.current.forEach((r:Tile[]) => {
+			r.forEach((tile:Tile)=>{
+				if(!tile.isStartTile && !tile.isEndTile ) {
+					if(tile.isWalkable){
+						clearTileClass(tile);
+						closed.current = closed.current.filter((tileC:Tile)=> tile.isWalkable)
+					}
+				}
+			})
+			
+		});
+		clickable.current = true;
+	}
+	return (
+		<div>
+			<div
+				id="Grid"
+				style={gridStyle}
+				ref={gridRef}
+				onMouseDown={() => {
+					mouseState.current = true;
+				}}
+				onMouseLeave={() => (mouseState.current = false)}
+				onMouseUp={() => (mouseState.current = false)}
+			>
+				{graph.current?.map((g: any, i: number) =>
+					g.map((tile: any) => (
+						<GridTile
+							key={Math.random() * 100000}
+							moveStartEnd={tileOnClickHandler}
+							close={addToClosed}
+							tile={tile}
+							saveRef={saveRef}
+							isMovingStart={isMovingStart}
+							isMovingEnd={isMovingEnd}
+							mouseState={mouseState}
+						/>
+					))
+				)}
+			</div>
+			<div className="button-tray">
+				<div>
+					<button
+						onClick={() => {
+												
+							if (!clickable.current) return;
+							if (startNode.current && endNode.current) {
+								aStar(
+									startNode.current,
+									endNode.current,
+									openHeapAstar,
+									closed,
+									db.current,
+									updateTile,
+									tileState,
+								);
+							}
+							clickable.current = false;
+						}}
+					>
+						Start Astar
       </button>
-      <button
-        onClick={() => {
-          if (!clickable.current) return;
-          if (startNode.current && endNode.current)
-            djikstra(
-              startNode.current,
-              endNode.current,
-              openHeapDjikstra,
-              closed,
-              db.current,
-              colors
-            );
-          clickable.current = false;
-        }}
-      >
-        Djikstra
+					<button
+						onClick={() => {
+							if (!clickable.current) return;
+							if (startNode.current && endNode.current)
+								djikstra(
+									startNode.current,
+									endNode.current,
+									openHeapDjikstra,
+									closed,
+									db.current,
+									tileState
+								);
+							clickable.current = false;
+						}}
+					>
+						Djikstra
       </button>
-      <button
-        onClick={() => {
-          if (!clickable.current) return;
-          isMovingEnd.current = false;
-          isMovingStart.current = true;
-        }}
-      >
-        Move Start
+					<button
+						onClick={() => {
+							if (!clickable.current) return;
+							if (startNode.current && endNode.current) bfs(startNode.current, endNode.current, db.current, openList, closed, tileState)
+							clickable.current = false;
+						}}
+					>
+						BFS
       </button>
-      <button
-        onClick={() => {
-          if (!clickable.current) return;
-          isMovingStart.current = false;
-          isMovingEnd.current = true;
-        }}
-      >
-        Move End
+				</div>
+				<div>
+
+					<button
+						className="start"
+						onClick={() => {
+							if (!clickable.current) return;
+							isMovingEnd.current = false;
+							isMovingStart.current = true;
+						}}
+					>
+						Move Start Node
       </button>
-      <button onClick={clearBoard}>clear board</button>
-    </div>
-  );
-};
+					<button
+						className="end"
+						onClick={() => {
+							if (!clickable.current) return;
+							isMovingStart.current = false;
+							isMovingEnd.current = true;
+						}}
+					>
+						Move End Node
+      </button>
+					<button onClick={()=>{
+						props.fullClear()
+						clearBoard()
+					}}>Clear Board</button>
+					{/* <button onClick={()=>{
+						clearBordWithWalls()
+					}}>Clear Board Leave Walls</button> */}
+				</div>
+			</div>
+		</div>
+	);
+}
 export default Grid;

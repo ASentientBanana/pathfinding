@@ -1,5 +1,6 @@
-import React from "react";
 import Tile from "./Tile";
+import retrace from './Retrace'
+import { MutableRefObject } from "react";
 
 const sleep = (ms: any) => new Promise((res) => setTimeout(res, ms));
 
@@ -7,9 +8,9 @@ const djikstra = async (
   startNode: Tile,
   endNode: Tile,
   open: any,
-  closed: Tile[],
+  closed: MutableRefObject<Tile[]>,
   db: any,
-  colors: any
+  setTileState:Function
 ) => {
   if (startNode) open.push(startNode);
 
@@ -18,22 +19,21 @@ const djikstra = async (
     let current: Tile;
     current = open.peek();
 
-    db[current.id].style["backgroundColor"] = colors.accentGreyColor;
-    db[current.id].style["border"] = `${colors.accentGoldColor} 0.5px solid`;
+    setTileState(current,'visited')
     current.setTileVisited();
     if (endNode !== undefined && current === endNode) {
-      if (startNode && endNode) retrace(startNode, endNode, db, colors);
+      if (startNode && endNode) retrace(startNode, endNode, db);
       return;
     }
     open.pop();
-    closed.push(current);
+    closed.current.push(current);
     // eslint-disable-next-line no-loop-func
     current.neighbors.forEach((tile: Tile) => {
-      if (!closed.includes(tile)) {
+      if (!closed.current.includes(tile)) {
         let movementCost: number;
         movementCost = current.g + 1;
         if (movementCost < tile.g || !open.nodes.includes(tile)) {
-          db[tile.id].style["backgroundColor"] = "#afc7f3";
+          setTileState(current,'visiting')
           tile.g = movementCost;
           tile.previusTile = current;
           open.push(tile);
@@ -43,20 +43,4 @@ const djikstra = async (
   }
 };
 
-const retrace = (start: Tile, end: Tile, db: any, colors: any) => {
-  const path: Tile[] = [];
-  let current: Tile = end;
-  while (current !== start) {
-    path.push(current);
-    if (current.previusTile) current = current.previusTile;
-  }
-  path.push(start);
-  path.reverse();
-  path.forEach((tile: Tile, index: number) => {
-    setTimeout(() => {
-      db[tile.id].style["backgroundColor"] = colors.accentGoldColor;
-      db[tile.id].style["border"] = `${colors.accentGreyColor} 0.5px solid`;
-    }, 50 * index);
-  });
-};
 export default djikstra;

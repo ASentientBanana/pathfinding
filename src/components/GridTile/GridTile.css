@@ -17,3 +17,25 @@
 .obsticle {
   background-color: white;
 }
+
+.visiting {
+  background-color: #afc7f3;
+}
+
+.visited {
+  background-color: #5f787b;
+  border: #eab354 0.5px solid;
+}
+
+.startTile {
+  background-color: greenyellow !important;
+}
+
+.endTile {
+  background-color: red !important;
+}
+
+.path {
+  background-color: #eab354;
+  border: solid 0.5px #5f787b;
+}

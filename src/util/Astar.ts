@@ -1,33 +1,34 @@
-import React, { FunctionComponent } from "react";
+
 import Tile from "./Tile";
+import retrace from './Retrace'
+import { MutableRefObject } from "react";
 const sleep = (ms: any) => new Promise((res) => setTimeout(res, ms));
 
 const aStar = async (
   startNode: Tile,
   endNode: Tile,
   open: any,
-  closed: Tile[],
+  closed: MutableRefObject<Tile[]>,
   db: any,
-  colors: any,
-  updateTile: any
-) => {
+  updateTile: any,
+  setTileState:Function
+  ) => {
   if (startNode) open.push(startNode);
   while (open.nodes.length > 0) {
     await sleep(1);
     let current: Tile;
     current = open.peek();
     if (!current.isEndTile || !current.isStartTile)
-      db[current.id].style["backgroundColor"] = colors.accentGreyColor;
-    db[current.id].style["border"] = `${colors.accentGoldColor} 0.5px solid`;
+    setTileState(current,'visited')
     current.setTileVisited();
     if (endNode !== undefined && current === endNode) {
-      if (startNode && endNode) retrace(startNode, endNode, db, colors);
+      if (startNode && endNode) retrace(startNode, endNode, db);
       return;
     }
     open.pop();
-    closed.push(current);
+    closed.current.push(current);
     current.neighbors.forEach((neighborTile: Tile) => {
-      if (!closed.includes(neighborTile)) {
+      if (!closed.current.includes(neighborTile)) {
         if (neighborTile.g === 0) {
           neighborTile.setGcost(current.g + 0.5);
           neighborTile.previusTile = current;
@@ -37,15 +38,17 @@ const aStar = async (
         }
         neighborTile.setHcost(getHeuristic(neighborTile, endNode));
         neighborTile.setFCost();
-        db[neighborTile.id].style["backgroundColor"] = "#afc7f3";
         if (!open.nodes.includes(neighborTile)) {
+          setTileState(neighborTile,'visited')
           open.push(neighborTile);
+          
+          console.log(closed.current.includes(neighborTile));
+          
         }
       }
     });
   }
 };
-
 function getHeuristic(tileA: Tile, tileB: Tile) {
   const D2 = 1.4142135623730951;
   const dx = Math.abs(tileA.x - tileB.x);
@@ -55,20 +58,5 @@ function getHeuristic(tileA: Tile, tileB: Tile) {
   // return D * (dx + dy) + (D2 - 2 * D) * Math.min(dx, dy);
 }
 
-const retrace = (start: Tile, end: Tile, db: any, colors: any) => {
-  const path: Tile[] = [];
-  let current: Tile = end;
-  while (current !== start) {
-    path.push(current);
-    if (current.previusTile) current = current.previusTile;
-  }
-  path.push(start);
-  path.reverse();
-  path.forEach((tile: Tile, index: number) => {
-    setTimeout(() => {
-      db[tile.id].style["backgroundColor"] = colors.accentGoldColor;
-      db[tile.id].style["border"] = `${colors.accentGreyColor} 0.5px solid`;
-    }, 15 * index);
-  });
-};
+
 export default aStar;

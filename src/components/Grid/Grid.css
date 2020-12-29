@@ -3,3 +3,47 @@
   height: 80vh !important;
   margin: auto;
 }
+
+.button-tray {
+  width: 80vw;
+  margin: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.button-tray div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+
+.button-tray div button {
+  width: 90%;
+  border: #eab354 solid 1px;
+  min-height: 35px;
+  background-color: #2d3636;
+  color: #eab354;
+  cursor: pointer;
+}
+
+.button-tray div .start {
+  border: greenyellow solid 1px;
+  color: greenyellow;
+}
+
+.button-tray div .end {
+  border: red solid 1px;
+  color: red;
+}
+
+.button-tray div button:hover {
+  border-width: 3px;
+  font-size: 1.2rem;
+}

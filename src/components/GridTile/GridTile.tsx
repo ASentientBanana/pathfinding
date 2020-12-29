@@ -30,7 +30,6 @@ const GridTile = ({
 }: GridTile) => {
   const tileRef = createRef<HTMLDivElement>();
   const tileId = useRef<string>(`node-${tile.y}-${tile.x}`);
-  const [obsticle, setObsticle] = useState<string>("null");
   useEffect(() => {
     resizeTiles();
     if (tile) tile.setId(tileId.current);
@@ -47,24 +46,26 @@ const GridTile = ({
     if (isMovingStart.current || isMovingEnd.current)
       moveStartEnd(tile.x, tile.y);
     else {
-      //set obsticle
       tile.setWalkable();
       close(tile);
-      if (obsticle === "null") setObsticle("obsticle");
-      else setObsticle("null");
+     if(!tile.isStartTile || !tile.isEndTile) {
+       if(tileRef.current?.className.includes('obsticle')){
+        tileRef.current?.classList.remove('obsticle')
+      }else{
+        tileRef.current?.classList.add('obsticle')
+      }
+     }
     }
   };
-  let colorStart: string = "";
   return (
     <div
-      className={`grid-tile ${obsticle}`}
+      className={`grid-tile `} 
       id={tileId.current}
       ref={tileRef}
       onClick={mouseDownHandler}
       onMouseOver={() => {
         if (mouseState.current) mouseDownHandler();
       }}
-      style={{ backgroundColor: colorStart }}
     ></div>
   );
 };

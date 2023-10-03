@@ -4,13 +4,8 @@
   text-align: center;
   font-size: 0.4em;
   cursor: pointer;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   color: white;
 }
 
@@ -39,3 +34,5 @@
   background-color: #eab354;
   border: solid 0.5px #5f787b;
 }
+
+/*# sourceMappingURL=GridTile.css.map */

@@ -1,14 +1,13 @@
 import React from 'react';
 import Tile from '../util/Tile';
-
-// in px
-export const TILE_SIZE = 20;
+import { usePathfinderStore } from '../store';
 
 
 const useGridSize = (grid: HTMLDivElement | null): number[] => {
+    const store = usePathfinderStore()
     if (grid) {
-        const widthCount: number = Math.floor(grid.clientWidth / TILE_SIZE)
-        const heightCount: number = Math.floor(grid.clientHeight / TILE_SIZE)
+        const widthCount: number = Math.floor(grid.clientWidth / store.tileSize)
+        const heightCount: number = Math.floor(grid.clientHeight / store.tileSize)
         if (widthCount) {
             return [widthCount, heightCount]
         }

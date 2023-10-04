@@ -1,0 +1,42 @@
+.MainNavContainer {
+  border: solid 1px #5f787b;
+  background-color: #262b2b;
+  width: 80%;
+  margin-bottom: 1rem;
+  height: 5rem;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.MainNavContainer .navTextColor {
+  color: #5f787b;
+  font-weight: 700;
+}
+.MainNavContainer .navBtn {
+  background-color: transparent;
+  border: solid 1px #5f787b;
+  width: 5rem;
+  height: 2rem;
+}
+.MainNavContainer .startBtn {
+  border: solid 1px lightgreen;
+  color: lightgreen;
+}
+.MainNavContainer .endBtn {
+  color: #FAA0A0;
+  border: solid 1px #FAA0A0;
+}
+.MainNavContainer .sizeControls {
+  display: flex;
+  flex-direction: row;
+}
+.MainNavContainer .algContainer {
+  display: flex;
+  gap: 2px;
+}
+.MainNavContainer .sizeControlElementContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+/*# sourceMappingURL=Nav.css.map */

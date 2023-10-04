@@ -42,7 +42,7 @@ const aStar = async (
           setTileState(neighborTile,'visited')
           open.push(neighborTile);
           
-          console.log(closed.current.includes(neighborTile));
+          // console.log(closed.current.includes(neighborTile));
           
         }
       }

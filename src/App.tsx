@@ -1,34 +1,20 @@
-import React, { useRef } from 'react';
-import Grid from './components/Grid/Grid';
-import Tile from './components/GridTile/GridTile';
-import './App.css'
-import MainContainer from './components/MainContainer';
-function App() {
-  const startNode = useRef<Tile>();
-  const endNode = useRef<Tile>();
-  const obsticlePositionArray = useRef<Tile[]>([])
-  const classDatabase = {}
-  const fullClearboard = () => {
-    console.log('test 1');
-    console.log(obsticlePositionArray);
-    obsticlePositionArray.current = []
-    console.log(obsticlePositionArray);
-    console.log('test 2');
-  }
+import Grid from "./components/Grid/Grid";
+import "./App.css";
+import MainContainer from "./components/MainContainer";
+import { usePathfinderStore } from "./store";
+import useDjikstra from "./hooks/alg/useDjikstra";
+import ControlPanel from "./components/nav";
 
+function App() {
+  const { start } = useDjikstra();
   return (
     <div className="app">
       <MainContainer>
-        <Grid
-          startTile={startNode}
-          endTile={endNode}
-          obsticlePos={obsticlePositionArray}
-          classDatabase={classDatabase}
-          fullClear={fullClearboard} />
+        <ControlPanel />
+        <Grid />
       </MainContainer>
     </div>
   );
-
 }
 
 export default App;

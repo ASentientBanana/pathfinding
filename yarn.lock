@@ -519,14 +519,7 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.8.tgz#805eae6e8f41bd19e88917d2ea200dc992f405d3"
   integrity sha512-kMpQpfZKSCBqltAJwskgePRaYRFukDkm1oItcAbC3gNELR20XIBcN9VRgg4+m8DKsTfkWeA4m4Imp4DDuWy7FQ==
 
-"@types/react-dom@^18.2.8":
-  version "18.2.8"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.2.8.tgz#338f1b0a646c9f10e0a97208c1d26b9f473dffd6"
-  integrity sha512-bAIvO5lN/U8sPGvs1Xm61rlRHHaq5rp5N3kp9C+NJ/Q41P8iqjkXSu0+/qu8POsjH9pNWb0OYabFez7taP7omw==
-  dependencies:
-    "@types/react" "*"
-
-"@types/react@*", "@types/react@^18.2.24":
+"@types/react@^18.2.24":
   version "18.2.24"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.2.24.tgz#3c7d68c02e0205a472f04abe4a0c1df35d995c05"
   integrity sha512-Ee0Jt4sbJxMu1iDcetZEIKQr99J1Zfb6D4F3qfUWoR1JpInkY1Wdg4WwCyBjL257D0+jGqSl1twBjV8iCaC0Aw==
@@ -1076,6 +1069,11 @@ use-deep-compare-effect@^1.5.1:
     "@babel/runtime" "^7.12.5"
     dequal "^2.0.2"
 
+use-sync-external-store@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
+
 vite-plugin-svgr@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-svgr/-/vite-plugin-svgr-4.1.0.tgz#f11072a873856039702bb66657379c53d3bb5d5a"
@@ -1109,3 +1107,10 @@ yallist@^3.0.2:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.1.1.tgz#dbb7daf9bfd8bac9ab45ebf602b8cbad0d5d08fd"
   integrity sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==
+
+zustand@^4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.4.2.tgz#e26ad331d0a2e28a7d4aa126b00c7140b34904bb"
+  integrity sha512-qF3/vZHCrjPUX5DvPE3DPDZlh+FiAWRKlP9PI7SlW1MCk8q4vUCDqyWsbF8K41ne0Yx8eeeb0m1cypn1LqUMYQ==
+  dependencies:
+    use-sync-external-store "1.2.0"

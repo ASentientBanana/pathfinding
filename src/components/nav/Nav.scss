@@ -1,0 +1,43 @@
+@import '../../static/colors.scss';
+
+.MainNavContainer{
+    border:solid 1px $accentGreyColor;
+    background-color: $bakgroundMainColor;
+    width: 80%;
+    margin-bottom: 1rem;
+    height: 5rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    .navTextColor{
+        color: $accentGreyColor;
+        font-weight: 700;
+    }
+    .navBtn{
+        background-color: transparent;
+        border:solid 1px $accentGreyColor;
+        width: 5rem;
+        height: 2rem;
+    }
+    .startBtn{
+        border:solid 1px lightgreen;
+        color: lightgreen;
+
+    }
+    .endBtn{
+        color: #FAA0A0;
+        border:solid 1px #FAA0A0;
+    }
+    .sizeControls{
+        display: flex;
+        flex-direction: row;
+    } 
+    .algContainer{
+        display: flex;
+        gap:2px;
+    }
+    .sizeControlElementContainer{
+        display: flex;
+        flex-direction: column;
+    }
+}

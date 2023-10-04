@@ -1,72 +1,87 @@
-import React, {
-  useState,
-  useEffect,
-  createRef,
-  useRef,
-  MutableRefObject,
-} from "react";
+import { createRef, memo } from "react";
 import "./GridTile.css";
 import Tile from "../../util/Tile";
-interface style {
-  backgroundColor: string;
-}
+import { usePathfinderStore } from "../../store";
+
 interface GridTile {
-  mouseState: any;
   tile: Tile;
-  isMovingStart: MutableRefObject<boolean>;
-  isMovingEnd: MutableRefObject<boolean>;
-  close: Function;
-  saveRef: Function;
-  moveStartEnd: Function;
 }
-const GridTile = ({
-  tile,
-  saveRef,
-  close,
-  mouseState,
-  isMovingStart,
-  isMovingEnd,
-  moveStartEnd,
-}: GridTile) => {
-  const tileRef = createRef<HTMLDivElement>();
-  const tileId = useRef<string>(`node-${tile.y}-${tile.x}`);
-  useEffect(() => {
-    resizeTiles();
-    if (tile) tile.setId(tileId.current);
-    if (tileRef.current) saveRef(tileRef, tile);
-  }, [tile.f]);
-  const resizeTiles = () => {
-    if (tileRef.current) {
-      const tile: HTMLDivElement = tileRef.current;
-      tile.style.height = `${25}px`;
-      tile.style.width = `${25}px`;
+const GridTile = ({ tile }: GridTile) => {
+  const tileRef = createRef<HTMLButtonElement>();
+  const store = usePathfinderStore();
+  const isStart =
+    tile.position.x === store.startTile.x &&
+    tile.position.y === store.startTile.y;
+  const isEnd =
+    tile.position.x === store.endTile.x && tile.position.y === store.endTile.y;
+
+  const handleClick = () => {
+    //moving start and end tiles
+    if (store.mode) {
+      store.setEdgeTiles(store.mode, tile.position);
+      return;
+    }
+    if (
+      tile.position.x === store.startTile.x &&
+      tile.position.y === store.startTile.y
+    ) {
+      return;
+    }
+    if (
+      tile.position.x === store.endTile.x &&
+      tile.position.y === store.endTile.y
+    ) {
+      return;
+    }
+    store.toggleWall(tile.position.x, tile.position.y);
+  };
+
+  const handleMouseOver = () => {
+    if (store.isDrawingWalls) {
+      store.toggleWall(tile.position.x, tile.position.y);
     }
   };
-  const mouseDownHandler = () => {
-    if (isMovingStart.current || isMovingEnd.current)
-      moveStartEnd(tile.x, tile.y);
-    else {
-      tile.setWalkable();
-      close(tile);
-     if(!tile.isStartTile || !tile.isEndTile) {
-       if(tileRef.current?.className.includes('obsticle')){
-        tileRef.current?.classList.remove('obsticle')
-      }else{
-        tileRef.current?.classList.add('obsticle')
-      }
-     }
-    }
-  };
+
   return (
-    <div
-      className={`grid-tile `} 
-      id={tileId.current}
+    <button
+      type="button"
+      className={`grid-tile`}
+      style={
+        isEnd || isStart
+          ? {
+              backgroundColor: isStart ? "lightgreen" : "#FAA0A0",
+              height: `${store.tileSize}px`,
+              width: `${store.tileSize}px`,
+            }
+          : tile.isPathTile
+          ? {
+              backgroundColor: "#eab354",
+            }
+          : {
+              backgroundColor: tile.isWall
+                ? "white"
+                : tile.isVisiting
+                ? "#5f987b"
+                : tile.isVisited
+                ? "#5f787b"
+                : "transparent",
+              height: `${store.tileSize}px`,
+              width: `${store.tileSize}px`,
+            }
+      }
+      disabled={store.inProgress}
       ref={tileRef}
-      onClick={mouseDownHandler}
-      onMouseOver={() => {
-        if (mouseState.current) mouseDownHandler();
+      onClick={handleClick}
+      onMouseDown={() => {
+        store.toggleDrawingWalls(true);
       }}
-    ></div>
+      onMouseUp={() => {
+        store.toggleDrawingWalls(false);
+      }}
+      onMouseOver={handleMouseOver}
+    >
+      {tile.gCost === Infinity ? "" : tile.gCost}
+    </button>
   );
 };
-export default GridTile;
+export default memo(GridTile);

@@ -3,7 +3,7 @@
 .MainNavContainer{
     border:solid 1px $accentGreyColor;
     background-color: $bakgroundMainColor;
-    width: 80%;
+    width: 800px;
     margin-bottom: 1rem;
     height: 5rem;
     display: flex;
@@ -15,9 +15,11 @@
     }
     .navBtn{
         background-color: transparent;
-        border:solid 1px $accentGreyColor;
+        border:solid 1px $accentGoldColor;
         width: 5rem;
         height: 2rem;
+        cursor: pointer;
+        color:$accentGoldColor;
     }
     .startBtn{
         border:solid 1px lightgreen;

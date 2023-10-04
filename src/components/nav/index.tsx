@@ -12,36 +12,56 @@ const ControlPanel = () => {
   return (
     <div className="MainNavContainer">
       <div className="algContainer">
-        <button className="navBtn navTextColor" onClick={djikstra.start}>
+        <button
+          disabled={store.inProgress}
+          className="navBtn navTextColor"
+          onClick={djikstra.start}
+        >
           Djikstra
         </button>
-        <button className="navBtn navTextColor" onClick={aStar.start}>
+        <button
+          disabled={store.inProgress}
+          className="navBtn navTextColor"
+          onClick={aStar.start}
+        >
           A-star
         </button>
-        {/* <button className="navBtn navTextColor" onClick={bfs.start}>
+        {/* <button
+        disabled={store.inProgress} className="navBtn navTextColor" onClick={bfs.start}>
           BFS
         </button> */}
-        <button className="navBtn navTextColor" onClick={store.randomize}>
+        <button
+          disabled={store.inProgress}
+          className="navBtn navTextColor"
+          onClick={store.randomize}
+        >
           Randomize
         </button>
       </div>
       <div className="algContainer">
         <button
+          disabled={store.inProgress}
           className="navBtn startBtn navTextColor"
           onClick={() => store.setMode("start")}
         >
           Move start
         </button>
         <button
+          disabled={store.inProgress}
           className="navBtn endBtn navTextColor"
           onClick={() => store.setMode("end")}
         >
           Move End
         </button>
-        <button className="navBtn navTextColor" onClick={() => store.clear()}>
+        <button
+          disabled={store.inProgress}
+          className="navBtn navTextColor"
+          onClick={() => store.clear()}
+        >
           Clear
         </button>
         <button
+          disabled={store.inProgress}
           className="navBtn navTextColor"
           onClick={() => store.clearWalls()}
         >

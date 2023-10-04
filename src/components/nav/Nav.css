@@ -1,7 +1,7 @@
 .MainNavContainer {
   border: solid 1px #5f787b;
   background-color: #262b2b;
-  width: 80%;
+  width: 800px;
   margin-bottom: 1rem;
   height: 5rem;
   display: flex;
@@ -14,9 +14,11 @@
 }
 .MainNavContainer .navBtn {
   background-color: transparent;
-  border: solid 1px #5f787b;
+  border: solid 1px #eab354;
   width: 5rem;
   height: 2rem;
+  cursor: pointer;
+  color: #eab354;
 }
 .MainNavContainer .startBtn {
   border: solid 1px lightgreen;

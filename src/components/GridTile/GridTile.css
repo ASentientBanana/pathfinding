@@ -12,6 +12,12 @@
   font-size: 1.1rem;
 }
 
+@media screen and (max-width: 400px) {
+  .btnText {
+    display: none;
+  }
+}
+
 .obsticle {
   background-color: white;
 }

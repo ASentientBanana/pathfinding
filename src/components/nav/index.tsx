@@ -8,7 +8,6 @@ const ControlPanel = () => {
   const store = usePathfinderStore();
   const djikstra = useDjikstra();
   const aStar = useAstar();
-  const bfs = useBFS();
   return (
     <div className="MainNavContainer">
       <div className="algContainer">
@@ -30,14 +29,14 @@ const ControlPanel = () => {
         disabled={store.inProgress} className="navBtn navTextColor" onClick={bfs.start}>
           BFS
         </button> */}
-        <button
-          disabled={store.inProgress}
-          className="navBtn navTextColor"
-          onClick={store.randomize}
-        >
-          Randomize
-        </button>
       </div>
+      <button
+        disabled={store.inProgress}
+        className="navBtn navTextColor"
+        onClick={store.randomize}
+      >
+        Randomize
+      </button>
       <div className="algContainer">
         <button
           disabled={store.inProgress}
@@ -58,14 +57,14 @@ const ControlPanel = () => {
           className="navBtn navTextColor"
           onClick={() => store.clear()}
         >
-          Clear
+          Clear path
         </button>
         <button
           disabled={store.inProgress}
           className="navBtn navTextColor"
           onClick={() => store.clearWalls()}
         >
-          Clear Walls
+          Clear all
         </button>
       </div>
       {/* <div className="sizeControls">

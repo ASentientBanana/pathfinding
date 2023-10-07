@@ -1,16 +1,22 @@
+import Tile from "../Models/Tile";
 
-
-
-export const sleep = (time: number = 10) => new Promise((res) => {
+export const sleep = (time: number = 10) =>
+  new Promise((res) => {
     setTimeout(() => {
-        res(null);
-    }, time)
-})
-// const colors = {
-  //   bakgroundMainColor: "#262b2b",
-  //   bakgroundColor: "#2d3636",
-  //   accentGoldColor: "#eab354",
-  //   accentGreyColor: "#5f787b",
-  //   accentGreenColor: "#66ff66",
-  //   accentRedColor: "#cc2900",
-  // };
+      res(null);
+    }, time);
+  });
+export const generateGrid = (gridSize: number, tileSize: number) => {
+  const _grid: Tile[][] = [];
+
+  const nRows = gridSize / tileSize;
+  const nCols = gridSize / tileSize;
+
+  for (let i = 0; i < nRows; i++) {
+    _grid.push([]);
+    for (let j = 0; j < nCols; j++) {
+      _grid[i].push(new Tile(`${j}-${i}`, { x: j, y: i }));
+    }
+  }
+  return _grid;
+};

@@ -1,4 +1,5 @@
 import useAstar from "../../hooks/alg/useAstar";
+import useAstarFast from "../../hooks/alg/useAstarFast";
 import useBFS from "../../hooks/alg/useBFS";
 import useDjikstra from "../../hooks/alg/useDjikstra";
 import { usePathfinderStore } from "../../store";
@@ -8,36 +9,47 @@ const ControlPanel = () => {
   const store = usePathfinderStore();
   const djikstra = useDjikstra();
   const aStar = useAstar();
+  const aStarFast = useAstarFast();
   return (
     <div className="MainNavContainer">
       <div className="algContainer">
+        <div className="algButtonsRow">
+          <button
+            disabled={store.inProgress}
+            className="navBtn navTextColor"
+            onClick={djikstra.start}
+          >
+            Djikstra
+          </button>
+          <button
+            disabled={store.inProgress}
+            className="navBtn navTextColor"
+            onClick={aStar.start}
+          >
+            A-star
+          </button>
+        </div>
         <button
           disabled={store.inProgress}
-          className="navBtn navTextColor"
-          onClick={djikstra.start}
+          className="rndBtn navBtn navTextColor"
+          onClick={store.randomize}
         >
-          Djikstra
+          Randomize
         </button>
-        <button
+        {/* <button
           disabled={store.inProgress}
           className="navBtn navTextColor"
-          onClick={aStar.start}
+          onClick={aStarFast.start}
         >
-          A-star
-        </button>
+          A-star Fast
+        </button> */}
         {/* <button
         disabled={store.inProgress} className="navBtn navTextColor" onClick={bfs.start}>
           BFS
         </button> */}
       </div>
-      <button
-        disabled={store.inProgress}
-        className="navBtn navTextColor"
-        onClick={store.randomize}
-      >
-        Randomize
-      </button>
-      <div className="algContainer">
+
+      <div className="utilContainer">
         <button
           disabled={store.inProgress}
           className="navBtn startBtn navTextColor"
@@ -67,38 +79,6 @@ const ControlPanel = () => {
           Clear all
         </button>
       </div>
-      {/* <div className="sizeControls">
-        <div className="sizeControlElementContainer">
-          <label className="navTextColor">Tile size: {store.tileSize}</label>
-          <input
-            type="range"
-            value={store.tileSize}
-            min={20}
-            max={100}
-            step={10}
-            onChange={(e) => {
-              store.setTileSize(+e.target.value);
-            }}
-            name=""
-            id=""
-          />
-        </div>
-        <div className="sizeControlElementContainer">
-          <label className="navTextColor">Grid size: {store.gridSize}</label>
-          <input
-            step={20}
-            min={1000}
-            max={500}
-            value={store.gridSize}
-            onChange={(e) => {
-              store.setGridSize(+e.target.value);
-            }}
-            type="range"
-            name=""
-            id=""
-          />
-        </div>
-      </div> */}
     </div>
   );
 };

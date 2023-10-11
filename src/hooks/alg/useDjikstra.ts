@@ -1,7 +1,8 @@
 import { usePathfinderStore } from "../../store";
 import Tile from "../../Models/Tile";
-import { sleep } from "../../util/Utility";
+import { compareTiles, sleep, validatePosition } from "../../util/Utility";
 import useRetrace from "./useRetrace";
+import { PQ } from "../../util/PriorityQ";
 
 const positions = [
   [1, 0],
@@ -10,41 +11,33 @@ const positions = [
   [0, -1],
 ];
 
-const validatePosition = (x: number, y: number, w: number, h: number) => {
-  if (x < 0 || x > w) {
-    return false;
-  }
-  if (y < 0 || y > h) {
-    return false;
-  }
-
-  return true;
-};
-
 const useDjikstra = () => {
   const store = usePathfinderStore();
   const { retrace } = useRetrace();
   const step = 10;
 
   const djikstra = async () => {
-    const grid = [...store.grid];
-    const openNodes: Tile[] = [];
-
+    const grid = [
+      ...store.grid.map((r) => {
+        return r.map((t) => ({ ...t }));
+      }),
+    ];
+    const openNodes = new PQ();
+    const endTile = grid[store.endTile.y][store.endTile.x];
     let current = grid[store.startTile.y][store.startTile.x];
+    openNodes.enqueue(current, 0);
     current.isVisited = true;
-    openNodes.push(current);
     current.gCost = 0;
-    let stopCounter = 0;
     let found = false;
-    while (!!openNodes.length) {
+    while (!!openNodes.data.length) {
+      console.log("das");
+
       if (found) {
         break;
       }
-      current = openNodes.shift()!;
+      current = openNodes.dequeue().val;
       current.isVisited = true;
       current.isVisiting = false;
-
-      stopCounter++;
       await sleep(5);
 
       // check neighbors
@@ -54,8 +47,8 @@ const useDjikstra = () => {
         const isValid = validatePosition(
           cX,
           cY,
-          grid.length - 1,
-          grid[0].length - 1
+          grid[0].length - 1,
+          grid.length - 1
         );
         if (!isValid) {
           continue;
@@ -65,11 +58,9 @@ const useDjikstra = () => {
         if (node.isVisited || node.isWall) {
           continue;
         }
+        console.log(compareTiles(node, endTile));
 
-        if (
-          node.position.x === store.endTile.x &&
-          node.position.y === store.endTile.y
-        ) {
+        if (compareTiles(node, endTile)) {
           found = true;
           node.parent = current;
           break;
@@ -79,20 +70,16 @@ const useDjikstra = () => {
 
         if (newScore < node.gCost) {
           node.gCost = newScore;
-        }
-        node.parent = current;
-        if (!openNodes.find((nd) => nd.id === node.id)) {
-          openNodes.push(node);
+          node.parent = current;
+          if (!openNodes.data.find((nd) => nd.val.id === node.id)) {
+            openNodes.enqueue(node, node.gCost);
+          }
         }
       }
       store.setGrid(grid);
-
-      openNodes.sort((a, b) => a.gCost - b.gCost);
     }
-    console.log(found);
-
     if (found) {
-      retrace(store.grid[store.endTile.y][store.endTile.x]);
+      retrace(endTile, grid);
     }
     store.toggleInProgress();
   };

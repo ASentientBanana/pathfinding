@@ -1,31 +1,5 @@
-.button-tray {
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-}
-.button-tray div {
-  display: flex;
-  justify-content: space-around;
-}
-.button-tray div button {
-  width: 90%;
-  border: #eab354 solid 1px;
-  min-height: 35px;
-  background-color: #2d3636;
-  color: #eab354;
-  cursor: pointer;
-}
-.button-tray div .start {
-  border: greenyellow solid 1px;
-  color: greenyellow;
-}
-.button-tray div .end {
-  border: red solid 1px;
-  color: red;
-}
-.button-tray div button:hover {
-  border-width: 3px;
-  font-size: 1.2rem;
+.MainGridContainer {
+  width: 98vw;
 }
 
 /*# sourceMappingURL=Grid.css.map */

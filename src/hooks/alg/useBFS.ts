@@ -83,7 +83,6 @@ const useBFS = () => {
       }
       store.setGrid(grid);
     }
-    console.log(found);
 
     if (found) {
       retrace(store.grid[store.endTile.y][store.endTile.x]);

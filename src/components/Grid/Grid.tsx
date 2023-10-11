@@ -1,35 +1,48 @@
-import { useRef } from "react";
 import GridTile from "../GridTile/GridTile";
 import "./Grid.css";
 
 import { usePathfinderStore } from "../../store";
 import useGridSize from "../../hooks/useGridSize";
+import { useRef } from "react";
 
 const Grid = () => {
   const store = usePathfinderStore();
   const { containerRef } = useGridSize();
   return (
     <div
-      ref={containerRef}
-      onMouseLeave={() => {
-        store.toggleDrawingWalls(false);
-        store.setDrawMode(null);
-        store.setMode(null);
-      }}
+      className="MainGridContainer"
       style={{
-        // border: "solid 1px red",
-        display: "grid",
-        gridTemplateColumns: `repeat(${Math.floor(
-          store.gridSize / store.tileSize
-        )},1fr`,
-        gap: 0,
+        display: "flex",
+        justifyContent: "center",
+        // height: "80vh",
+        // border: "1px red solid",
       }}
     >
-      {store.grid.map((r, y) =>
-        r.map((t) => {
-          return <GridTile key={t.id} tile={t} />;
-        })
-      )}
+      <div
+        ref={containerRef}
+        onMouseLeave={() => {
+          store.toggleDrawingWalls(false);
+          store.setDrawMode(null);
+          store.setMode(null);
+        }}
+        className="das"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
+        {store.grid.map((r, y) => {
+          const refMap: {
+            [index: string]: React.RefObject<HTMLButtonElement>;
+          } = {};
+          const grid = r.map((t) => {
+            return <GridTile key={t.id} tile={t} />;
+          });
+
+          return grid;
+        })}
+      </div>
     </div>
   );
 };

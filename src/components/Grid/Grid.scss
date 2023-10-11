@@ -1,33 +1,6 @@
 @import '../../static/colors.scss';
 
-.button-tray{
-    // width: ;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    div{
-        display: flex;
-        justify-content: space-around;
-        button{
-            width: 90%;
-            border :$accentGoldColor solid 1px;
-            min-height: 35px;
-            background-color: $bakgroundColor;
-            color: $accentGoldColor ;
-            cursor: pointer;
-        }
-        .start{
-            border: greenyellow solid 1px;
-            color:greenyellow;
-        }
-        .end{
-            border: red solid 1px;
-            color: red;
-        }
-        button:hover{
-            border-width: 3px;
-            font-size: 1.2rem;
-        }
-    }
-
+.MainGridContainer{
+    // border:solid 1px red;
+    width: 98vw;
 }

@@ -4,13 +4,16 @@ import { sleep } from "../../util/Utility";
 
 const useRetrace = () => {
   const store = usePathfinderStore();
-  const retrace = async (start: Tile) => {
-    const grid = [...store.grid];
+  const retrace = async (start: Tile, grid: any[]) => {
+    // const grid = [
+    //   ...store.grid.map((r) => {
+    //     return r.map((t) => ({ ...t }));
+    //   }),
+    // ];
 
     const nodes: Tile[] = [];
     let current = start;
     while (!!current.parent) {
-      console.log("search");
       nodes.push(current.parent);
       current = current.parent;
     }

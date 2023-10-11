@@ -1,3 +1,5 @@
+import { Vector2D } from "../types";
+
 class Tile {
   isVisited: boolean = false;
   isVisiting: boolean = false;
@@ -7,8 +9,8 @@ class Tile {
   id: string;
   position: Vector2D;
   gCost: number = Infinity;
-  hCost: number = 0;
-  fCost: number = 0;
+  hCost: number = Infinity;
+  fCost: number = Infinity;
   parent: Tile | null = null;
 
   constructor(id: string, position: Vector2D) {
